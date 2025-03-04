@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Stars Exchange</title>
+    <style>
+        :root {
+            --telegram-blue: #0088cc;
+            --telegram-blue-hover: #0077b3;
+            --telegram-bg: #f5f5f5;
+            --telegram-light: #ffffff;
+            --telegram-dark: #333333;
+            --telegram-secondary: #757575;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            background-color: var(--telegram-bg);
+            color: var(--telegram-dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--telegram-light);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        header {
+            background: var(--telegram-blue);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .steps {
+            display: flex;
+            background: var(--telegram-blue);
+            padding: 0 20px;
+        }
+        
+        .step {
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .step.active {
+            color: white;
+            font-weight: 500;
+        }
+        
+        .step.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: white;
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .tab {
+            display: none;
+        }
+        
+        .tab.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .calculator {
+            background: rgba(0, 136, 204, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .calculator h3 {
+            margin-bottom: 20px;
+            color: var(--telegram-blue);
+        }
+        
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .input-field {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--telegram-blue);
+            outline: none;
+        }
+        
+        .result {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+        
+        .result h4 {
+            margin-bottom: 15px;
+            color: var(--telegram-secondary);
+        }
+        
+        .result-amount {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--telegram-blue);
+            margin-bottom: 10px;
+        }
+        
+        .result-rate {
+            color: var(--telegram-secondary);
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            padding: 30px;
+            text-align: center;
+            border-radius: 6px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--telegram-blue);
+            background: rgba(0, 136, 204, 0.05);
+        }
+        
+        .upload-area i {
+            font-size: 40px;
+            color: var(--telegram-secondary);
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button.back {
+            background: #eee;
+            color: var(--telegram-secondary);
+        }
+        
+        button.back:hover {
+            background: #ddd;
+        }
+        
+        button.next, button.submit {
+            background: var(--telegram-blue);
+            color: white;
+        }
+        
+        button.next:hover, button.submit:hover {
+            background: var(--telegram-blue-hover);
+        }
+        
+        button.skip {
+            background: transparent;
+            color: var(--telegram-secondary);
+            border: 1px solid #ddd;
+            margin-right: 10px;
+        }
+        
+        button.skip:hover {
+            background: #f5f5f5;
+        }
+        
+        .field-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--telegram-secondary);
+        }
+        
+        .card-input {
+            position: relative;
+        }
+        
+        .card-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .card-row .input-field {
+            flex: 1;
+        }
+        
+        .telegram-star {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .star-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--telegram-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .completion-message {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .completion-message i {
+            font-size: 60px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .completion-message h2 {
+            margin-bottom: 15px;
+            color: #4CAF50;
+        }
+        
+        .completion-message p {
+            color: var(--telegram-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .error-message {
+            color: #f44336;
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .currency-logo {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Telegram Stars Exchange</h1>
+            <p>Convert your Telegram Stars to cash quickly and securely</p>
+        </header>
+        
+        <div class="steps">
+            <div class="step active" data-step="1">1. Calculate Exchange</div>
+            <div class="step" data-step="2">2. Bank Details</div>
+            <div class="step" data-step="3">3. Verification</div>
+            <div class="step" data-step="4">4. Confirmation</div>
+        </div>
+        
+        <div class="content">
+            <!-- Step 1: Calculator -->
+            <div class="tab active" id="step1">
+                <div class="telegram-star">
+                    <div class="star-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div>
+                        <strong>Telegram Stars</strong>
+                        <div>Current rate: 1 Star = €0.02</div>
+                    </div>
+                </div>
+                
+                <div class="calculator">
+                    <h3>Exchange Calculator</h3>
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label for="stars-amount">Number of Stars</label>
+                            <input type="number" id="stars-amount" min="1" value="100">
+                        </div>
+                        <div class="input-field">
+                            <label for="currency">Currency</label>
+                            <select id="currency">
+                                <option value="EUR" data-symbol="€">EUR - Euro</option>
+                                <option value="USD" data-symbol="$">USD - US Dollar</option>
+                                <option value="GBP" data-symbol="£">GBP - British Pound</option>
+                                <option value="JPY" data-symbol="¥">JPY - Japanese Yen</option>
+                                <option value="CAD" data-symbol="C$">CAD - Canadian Dollar</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="result">
+                        <h4>You will receive:</h4>
+                        <div class="result-amount" id="result-amount">€2.00</div>
+                        <div class="result-rate" id="result-rate">
+                            Exchange rate: 1 Telegram Star = €0.02
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <div></div>
+                    <button class="next" data-next="2">Continue to Bank Details</button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Bank Details -->
+            <div class="tab" id="step2">
+                <h3>Bank Card Information</h3>
+                <p style="margin-bottom: 20px; color: var(--telegram-secondary);">Please enter your bank card details where you would like to receive the funds.</p>
+                
+                <div class="form-group">
+                    <label for="cardholder">Cardholder Name</label>
+                    <input type="text" id="cardholder" placeholder="As appears on card">
+                    <div class="error-message">Please enter cardholder name</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="card-number">Card Number</label>
+                    <div class="card-input">
+                        <input type="text" id="card-number" placeholder="XXXX XXXX XXXX XXXX" maxlength="19">
+                        <i class="fas fa-credit-card field-icon"></i>
+                    </div>
+                    <div class="error-message">Please enter a valid card number</div>
+                </div>
+                
+                <div class="card-row">
+                    <div class="input-field">
+                        <div class="form-group">
+                            <label for="expiry">Expiry Date</label>
+                            <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+                            <div class="error-message">Please enter a valid expiry date</div>
+                        </div>
+                    </div>
+                    <div class="input-field">
+                        <div class="form-group">
+                            <label for="cvv">CVV</label>
+                            <div class="card-input">
+                                <input type="text" id="cvv" placeholder="XXX" maxlength="3">
+                                <i class="fas fa-question-circle field-icon"></i>
+                            </div>
+                            <div class="error-message">Please enter a valid CVV</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="back" data-prev="1">Back</button>
+                    <div>
+                        <button class="skip" data-next="3">Skip this step</button>
+                        <button class="next" data-next="3">Continue to Verification</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Verification -->
+            <div class="tab" id="step3">
+                <h3>Upload Verification Documents</h3>
+                <p style="margin-bottom: 20px; color: var(--telegram-secondary);">For security purposes, please upload your ID document and a photo of your bank card.</p>
+                
+                <div class="form-group">
+                    <label>ID Document (Passport, ID card, Driver's License)</label>
+                    <div class="upload-area" id="id-upload-area">
+                        <i class="fas fa-id-card"></i>
+                        <p>Click to upload or drag your ID document here</p>
+                        <p style="font-size: 14px; color: var(--telegram-secondary); margin-top: 10px;">Supported formats: JPG, PNG, PDF (max 5MB)</p>
+                    </div>
+                    <input type="file" id="id-document" class="file-input" accept="image/jpeg, image/png, application/pdf">
+                    <img src="" id="id-preview" class="preview-image">
+                    <div class="error-message">Please upload an ID document</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Photo of Bank Card (cover middle 8 digits)</label>
+                    <div class="upload-area" id="card-upload-area">
+                        <i class="fas fa-credit-card"></i>
+                        <p>Click to upload or drag your bank card photo here</p>
+                        <p style="font-size: 14px; color: var(--telegram-secondary); margin-top: 10px;">
+                            For security, please cover the middle 8 digits of your card number and the CVV
+                        </p>
+                    </div>
+                    <input type="file" id="card-photo" class="file-input" accept="image/jpeg, image/png">
+                    <img src="" id="card-preview" class="preview-image">
+                    <div class="error-message">Please upload a bank card photo</div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="back" data-prev="2">Back</button>
+                    <button class="next" data-next="4">Complete Exchange Request</button>
+                </div>
+            </div>
+            
+            <!-- Step 4: Confirmation -->
+            <div class="tab" id="step4">
+                <div class="completion-message">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Exchange Request Submitted!</h2>
+                    <p>
+                        Your request to exchange <span id="final-stars">100</span> Telegram Stars for 
+                        <span id="final-amount">€2.00</span> has been submitted successfully.
+                    </p>
+                    <p style="margin-top: 15px;" id="payment-message">
+                        We'll review your verification documents and process your payment within 1-2 business days.
+                        You'll receive a notification when the funds are transferred to your account.
+                    </p>
+                    <p style="margin-top: 15px; display: none;" id="skipped-message">
+                        Since you skipped the bank details step, you'll need to provide payment information later.
+                        Please check your Telegram notifications for instructions on how to complete the payment process.
+                    </p>
+                    <div style="margin-top: 30px;">
+                        <button class="next" onclick="resetForm()">Start a New Exchange</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        const BASE_CURRENCY = 'EUR';
+        const BASE_RATE = 0.02; // 1 Telegram Star = 0.02 EUR
+        const exchangeRates = {
+            EUR: 1.00,
+            USD: 1.07,
+            GBP: 0.85,
+            JPY: 160.20,
+            CAD: 1.45
+        };
+        
+        // Flag to track if bank details step is skipped
+        let isBankDetailsSkipped = false;
+        
+        // DOM Elements
+        const starsInput = document.getElementById('stars-amount');
+        const currencySelect = document.getElementById('currency');
+        const resultAmount = document.getElementById('result-amount');
+        const resultRate = document.getElementById('result-rate');
+        const finalStars = document.getElementById('final-stars');
+        const finalAmount = document.getElementById('final-amount');
+        
+        // Navigation elements
+        const steps = document.querySelectorAll('.step');
+        const tabs = document.querySelectorAll('.tab');
+        const nextButtons = document.querySelectorAll('.next');
+        const backButtons = document.querySelectorAll('.back');
+        
+        // Form elements
+        const cardNumberInput = document.getElementById('card-number');
+        const expiryInput = document.getElementById('expiry');
+        const cvvInput = document.getElementById('cvv');
+        
+        // Upload elements
+        const idUploadArea = document.getElementById('id-upload-area');
+        const cardUploadArea = document.getElementById('card-upload-area');
+        const idInput = document.getElementById('id-document');
+        const cardInput = document.getElementById('card-photo');
+        const idPreview = document.getElementById('id-preview');
+        const cardPreview = document.getElementById('card-preview');
+        
+        // Calculate exchange rate
+        function calculateExchange() {
+            const starsAmount = parseFloat(starsInput.value) || 0;
+            const currency = currencySelect.value;
+            const rate = BASE_RATE * exchangeRates[currency];
+            
+            // Get currency symbol
+            const symbol = currencySelect.options[currencySelect.selectedIndex].dataset.symbol;
+            
+            // Calculate amount
+            const amount = starsAmount * rate;
+            
+            // Update result
+            resultAmount.textContent = `${symbol}${amount.toFixed(2)}`;
+            resultRate.textContent = `Exchange rate: 1 Telegram Star = ${symbol}${rate.toFixed(4)}`;
+            
+            // Update final confirmation
+            finalStars.textContent = starsAmount;
+            finalAmount.textContent = `${symbol}${amount.toFixed(2)}`;
+        }
+        
+        // Navigation functionality
+        function navigateTo(stepNumber) {
+            // Hide all tabs
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show the selected tab
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+            
+            // Update step indicators
+            steps.forEach(step => {
+                step.classList.remove('active');
+                if (parseInt(step.dataset.step) <= stepNumber) {
+                    step.classList.add('completed');
+                }
+                if (parseInt(step.dataset.step) === stepNumber) {
+                    step.classList.add('active');
+                }
+            });
+        }
+        
+        // Format card number with spaces
+        function formatCardNumber(input) {
+            let value = input.value.replace(/\s+/g, '');
+            if (value.length > 0) {
+                value = value.match(new RegExp('.{1,4}', 'g')).join(' ');
+            }
+            input.value = value;
+        }
+        
+        // Format expiry date
+        function formatExpiry(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            input.value = value;
+        }
+        
+        // Handle file uploads
+        function handleFileUpload(fileInput, previewElement, uploadArea) {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewElement.src = e.target.result;
+                    previewElement.style.display = 'block';
+                    uploadArea.innerHTML = `<p>File selected: ${file.name}</p>`;
+                    uploadArea.style.padding = '15px';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Reset form
+        function resetForm() {
+            starsInput.value = 100;
+            currencySelect.value = 'EUR';
+            document.getElementById('cardholder').value = '';
+            cardNumberInput.value = '';
+            expiryInput.value = '';
+            cvvInput.value = '';
+            idPreview.style.display = 'none';
+            cardPreview.style.display = 'none';
+            isBankDetailsSkipped = false;
+            idUploadArea.innerHTML = `
+                <i class="fas fa-id-card"></i>
+                <p>Click to upload or drag your ID document here</p>
+                <p style="font-size: 14px; color: var(--telegram-secondary); margin-top: 10px;">Supported formats: JPG, PNG, PDF (max 5MB)</p>
+            `;
+            cardUploadArea.innerHTML = `
+                <i class="fas fa-credit-card"></i>
+                <p>Click to upload or drag your bank card photo here</p>
+                <p style="font-size: 14px; color: var(--telegram-secondary); margin-top: 10px;">
+                    For security, please cover the middle 8 digits of your card number and the CVV
+                </p>
+            `;
+            document.getElementById('payment-message').style.display = 'block';
+            document.getElementById('skipped-message').style.display = 'none';
+            calculateExchange();
+            navigateTo(1);
+        }
+        
+        // Validate form
+        function validateStep(step) {
+            let isValid = true;
+            
+            if (step === 2) {
+                // Check if we're skipping this step
+                if (isBankDetailsSkipped) {
+                    return true;
+                }
+                
+                // Bank details validation
+                const cardholderInput = document.getElementById('cardholder');
+                if (!cardholderInput.value.trim()) {
+                    cardholderInput.nextElementSibling.style.display = 'block';
+                    isValid = false;
+                } else {
+                    cardholderInput.nextElementSibling.style.display = 'none';
+                }
+                
+                if (cardNumberInput.value.replace(/\s/g, '').length < 16) {
+                    cardNumberInput.parentElement.nextElementSibling.style.display = 'block';
+                    isValid = false;
+                } else {
+                    cardNumberInput.parentElement.nextElementSibling.style.display = 'none';
+                }
+                
+                if (expiryInput.value.length < 5) {
+                    expiryInput.nextElementSibling.style.display = 'block';
+                    isValid = false;
+                } else {
+                    expiryInput.nextElementSibling.style.display = 'none';
+                }
+                
+                if (cvvInput.value.length < 3) {
+                    cvvInput.parentElement.nextElementSibling.style.display = 'block';
+                    isValid = false;
+                } else {
+                    cvvInput.parentElement.nextElementSibling.style.display = 'none';
+                }
+            }
+            
+            if (step === 3) {
+                // Verification files validation
+                if (!idInput.files.length) {
+                    idUploadArea.nextElementSibling.nextElementSibling.nextElementSibling.style.display = 'block';
+                    isValid = false;
+                } else {
+                    idUploadArea.nextElementSibling.nextElementSibling.nextElementSibling.style.display = 'none';
+                }
+                
+                if (!cardInput.files.length) {
+                    cardUploadArea.nextElementSibling.nextElementSibling.nextElementSibling.style.display = 'block';
+                    isValid = false;
+                } else {
+                    cardUploadArea.nextElementSibling.nextElementSibling.nextElementSibling.style.display = 'none';
+                }
+            }
+            
+            return isValid;
+        }
+        
+        // Event Listeners
+        starsInput.addEventListener('input', calculateExchange);
+        currencySelect.addEventListener('change', calculateExchange);
+        
+        // Add skip button functionality
+        document.querySelector('.skip').addEventListener('click', function() {
+            isBankDetailsSkipped = true;
+            const nextStep = parseInt(this.dataset.next);
+            navigateTo(nextStep);
+        });
+        
+        // Format card inputs
+        cardNumberInput.addEventListener('input', () => formatCardNumber(cardNumberInput));
+        expiryInput.addEventListener('input', () => formatExpiry(expiryInput));
+        cvvInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').substring(0, 3);
+        });
+        
+        // Navigation event listeners
+        nextButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const nextStep = parseInt(this.dataset.next);
+                const currentStep = nextStep - 1;
+                
+                if (validateStep(currentStep)) {
+                    // If we're moving to the final step, update confirmation message based on whether bank details were skipped
+                    if (nextStep === 4) {
+                        if (isBankDetailsSkipped) {
+                            document.getElementById('payment-message').style.display = 'none';
+                            document.getElementById('skipped-message').style.display = 'block';
+                        } else {
+                            document.getElementById('payment-message').style.display = 'block';
+                            document.getElementById('skipped-message').style.display = 'none';
+                        }
+                    }
+                    
+                    navigateTo(nextStep);
+                }
+            });
+        });
+        
+        backButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const prevStep = parseInt(this.dataset.prev);
+                navigateTo(prevStep);
+            });
+        });
+        
+        steps.forEach(step => {
+            step.addEventListener('click', function() {
+                const stepNum = parseInt(this.dataset.step);
+                const currentStep = getCurrentStep();
+                
+                // Only allow navigating to completed steps or next step
+                if (stepNum <= currentStep) {
+                    navigateTo(stepNum);
+                }
+            });
+        });
+        
+        // File upload event listeners
+        idUploadArea.addEventListener('click', () => idInput.click());
+        cardUploadArea.addEventListener('click', () => cardInput.click());
+        
+        idInput.addEventListener('change', () => handleFileUpload(idInput, idPreview, idUploadArea));
+        cardInput.addEventListener('change', () => handleFileUpload(cardInput, cardPreview, cardUploadArea));
+        
+        // Drag and drop functionality
+        [idUploadArea, cardUploadArea].forEach(area => {
+            area.addEventListener('dragover', e => {
+                e.preventDefault();
+                area.style.borderColor = 'var(--telegram-blue)';
+                area.style.background = 'rgba(0, 136, 204, 0.1)';
+            });
+            
+            area.addEventListener('dragleave', e => {
+                e.preventDefault();
+                area.style.borderColor = '#ddd';
+                area.style.background = 'transparent';
+            });
+        });
+        
+        idUploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            idUploadArea.style.borderColor = '#ddd';
+            idUploadArea.style.background = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                idInput.files = e.dataTransfer.files;
+                handleFileUpload(idInput, idPreview, idUploadArea);
+            }
+        });
+        
+        cardUploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            cardUploadArea.style.borderColor = '#ddd';
+            cardUploadArea.style.background = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                cardInput.files = e.dataTransfer.files;
+                handleFileUpload(cardInput, cardPreview, cardUploadArea);
+            }
+        });
+        
+        // Helper function to get current step
+        function getCurrentStep() {
+            for (let i = 0; i < tabs.length; i++) {
+                if (tabs[i].classList.contains('active')) {
+                    return i + 1;
+                }
+            }
+            return 1;
+        }
+        
+        // Initialize
+        calculateExchange();
+    </script>
+</body>
+</html>
